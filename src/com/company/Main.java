@@ -1,5 +1,6 @@
 package com.company;
 
+import java.beans.Transient;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
