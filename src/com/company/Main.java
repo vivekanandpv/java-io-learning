@@ -1,23 +1,33 @@
 package com.company;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        int b;
-        FileInputStream fileInputStream = new FileInputStream("readme.txt");
+        try (ServerSocket serverSocket = new ServerSocket(3000)) {
+            try(Socket incomingRequest = serverSocket.accept()) {
+                InputStream inputStream = incomingRequest.getInputStream();
+                OutputStream outputStream = incomingRequest.getOutputStream();
 
-        try {
-            do {
-                b = fileInputStream.read();
-                if (b != -1) {
-                    System.out.print((char) b);
+                try (Scanner scanner = new Scanner(inputStream, "UTF-8")) {
+                    PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true);
+
+                    boolean done = false;
+
+                    while(!done && scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        printWriter.println(line);
+
+                        if (line.trim().equals("q")) {
+                            done = true;
+                        }
+                    }
                 }
-            } while (b != -1);
-        } finally {
-            fileInputStream.close();
+            }
         }
     }
 }
