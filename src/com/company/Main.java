@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -14,27 +15,27 @@ import java.nio.file.StandardOpenOption;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        // Reading
-        FileChannel readerChannel = FileChannel.open(Paths.get("readme.txt"), StandardOpenOption.READ);
-        FileChannel writerChannel = FileChannel.open(Paths.get("readme-copy.txt"), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(1024*1024);  // 1MB
 
-        ByteBuffer readerBuffer = ByteBuffer.allocate(1024);
-        ByteBuffer writerBuffer = ByteBuffer.allocate(1024);
+        byteBuffer.putInt(100);
+        byteBuffer.putInt(200);
+        byteBuffer.putInt(300);
+        byteBuffer.putInt(400);
+        byteBuffer.putInt(500);
 
-        readerChannel.read(readerBuffer);
-        readerBuffer.flip();
+        System.out.println("Before Flip: Position: " + byteBuffer.position());
+        System.out.println("Before Flip: Limit: " + byteBuffer.limit());
 
-        Charset utf8Charset = StandardCharsets.UTF_8;
-        CharBuffer readerCharBuffer = utf8Charset.decode(readerBuffer);
+        byteBuffer.flip();
 
-        System.out.println(readerCharBuffer.toString());
+        System.out.println("After Flip: Position: " + byteBuffer.position());
+        System.out.println("After Flip: Limit: " + byteBuffer.limit());
 
-        ByteBuffer writerByteBuffer = utf8Charset.encode(readerCharBuffer.toString());
-        writerBuffer.put(readerBuffer);
-        writerChannel.write(writerByteBuffer);
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
 
-        readerChannel.close();
-        writerChannel.close();
+        for (int i =0; i < intBuffer.limit(); i++) {
+            System.out.println("> " + intBuffer.get());
+        }
     }
 
 
